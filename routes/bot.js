@@ -35,9 +35,9 @@ bot.dialog('survey', [
         userRef.child(session.message.user.id).child("updateType").set(results.response.entity);
         userRef.child(results.response.entity).child(session.message.user.id)
             .set(userSnap.child(session.message.user.id).val());
-        if(usersnap !== null) {
-            userSnap.child(session.message.user.id).remove();
-        }
+        // if(usersnap !== null) {
+        //     userSnap.child(session.message.user.id).remove();
+        // }
         session.endDialog('You are now subscribed to ' + results.response.entity + ' RM Updates.');
     }
 ]);
