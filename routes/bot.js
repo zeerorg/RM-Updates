@@ -35,9 +35,6 @@ bot.dialog('survey', [
         userRef.child(session.message.user.id).child("updateType").set(results.response.entity);
         userRef.child(results.response.entity).child(session.message.user.id)
             .set(userSnap.child(session.message.user.id).val());
-        // if(usersnap !== null) {
-        //     userSnap.child(session.message.user.id).remove();
-        // }
         session.endDialog('You are now subscribed to ' + results.response.entity + ' RM Updates.');
     }
 ]);
@@ -74,20 +71,26 @@ newsRef.on('child_added', function (snapshot) {
             .set(firebase.database.ServerValue.TIMESTAMP);
         let notification = snapshot.val().notification;
         if (userSnap !== null) {
+            // Delete stray users
             userSnap.forEach(function (user) {
-                if (user.val().updateType === "Placement")
-                    bot.send(new builder.Message()
-                        .text("Notification Update:\n\n" +
-                            notification.date + " " + notification.time + "\n\n\n\n" +
-                            notification.header + "\n\n\n\n" +
-                            notification.body + "\n\n\n\n" +
-                            "Posted By: " + notification.poster)
-                        .address(user.val().address)
-                        .sourceEvent({
-                            facebook: {
-                                notification_type: "REGULAR"
-                            }
-                        }));
+                if (user.val() !== "Placement" || user.val() !== "Internship") {
+                    userSnap.child(user.address.user.id).remove();
+                }
+            });
+
+            userSnap.child("Placement").forEach(function (user) {
+                bot.send(new builder.Message()
+                    .text("Notification Update:\n\n---\n\n" +
+                        notification.date + " " + notification.time + "\n\n\n\n" +
+                        notification.header + "\n\n\n\n" +
+                        notification.body + "\n\n\n\n" +
+                        "Posted By: " + notification.poster)
+                    .address(user.val().address)
+                    .sourceEvent({
+                        facebook: {
+                            notification_type: "REGULAR"
+                        }
+                    }));
             });
         }
     }
@@ -99,8 +102,7 @@ newsInternRef.on('child_added', function (snapshot) {
             .set(firebase.database.ServerValue.TIMESTAMP);
         let notification = snapshot.val().notification;
         if (userSnap !== null) {
-            userSnap.forEach(function (user) {
-                if (user.val().updateType === "Internship")
+            userSnap.child("Internship").forEach(function (user) {
                     bot.send(new builder.Message()
                         .text("Notification Update:\n\n" +
                             notification.date + " " + notification.time + "\n\n\n\n" +
@@ -124,8 +126,7 @@ jobsRef.on('child_added', function (snapshot) {
             .set(firebase.database.ServerValue.TIMESTAMP);
         let job = snapshot.val().job;
         if (userSnap !== null) {
-            userSnap.forEach(function (user) {
-                if (user.val().updateType === "Placement")
+            userSnap.child("Placement").forEach(function (user) {
                     bot.send(new builder.Message()
                         .text("Job Opening Update:\n\n\n\n" +
                             job.name + "\n\n\n\n" +
@@ -149,8 +150,7 @@ internJobsRef.on('child_added', function (snapshot) {
             .set(firebase.database.ServerValue.TIMESTAMP);
         let job = snapshot.val().job;
         if (userSnap !== null) {
-            userSnap.forEach(function (user) {
-                if (user.val().updateType === "Internship")
+            userSnap.child("Internship").forEach(function (user) {
                     bot.send(new builder.Message()
                         .text("Job Opening Update:\n\n\n\n" +
                             job.name + "\n\n\n\n" +
