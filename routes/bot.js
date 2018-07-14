@@ -71,13 +71,7 @@ newsRef.on('child_added', function (snapshot) {
             .set(firebase.database.ServerValue.TIMESTAMP);
         let notification = snapshot.val().notification;
         if (userSnap !== null) {
-            // Delete stray users
-            userSnap.forEach(function (user) {
-                if (user.val() !== "Placement" || user.val() !== "Internship") {
-                    userSnap.child(user.address.user.id).remove();
-                }
-            });
-
+            
             userSnap.child("Placement").forEach(function (user) {
                 bot.send(new builder.Message()
                     .text("Notification Update:\n\n---\n\n" +
